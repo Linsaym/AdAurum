@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CompanyCommentController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FieldCommentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -14,9 +17,12 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/adaurum', fn() => Inertia::render('AdAurum'))->name('adaurum');
+    Route::get('/busyspace', fn() => Inertia::render('BusySpace'))->name('busyspace');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -24,4 +30,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::get('/companies', [CompanyController::class, 'index']);
+Route::get('/companies/{companyId}', [CompanyController::class, 'show']);
+
+Route::get('companies/{companyId}/comments', [CompanyCommentController::class, 'show'])->name('company_comments.show');
+Route::post('companies/{companyId}/comments', [CompanyCommentController::class, 'store'])->name('company_comments.store');
+Route::post('companies/{companyId}/field_comment', [FieldCommentController::class, 'store'])->name('field_comments.store');
+
+
+require __DIR__ . '/auth.php';
