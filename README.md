@@ -11,10 +11,10 @@
 (Xampp нужен для того, чтобы на windows, поднять SQL и Apache. Либо вы можете сами развернуть сервер, через докер
 контейнер или на Linux)
 
-Далее, клонируйте репозиторий c API себе:
+Далее, клонируйте репозиторий себе:
 
 ```sh
-git clone https://github.com/Linsaym/PumpHouse_API
+git clone https://github.com/Linsaym/AdAurum
 ```
 
 Переименуйте файл <strong>.env.example</strong> в <strong>.env</strong> и настройте файл под себя.
