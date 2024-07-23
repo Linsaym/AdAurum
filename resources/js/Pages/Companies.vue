@@ -14,8 +14,8 @@ import {Head, Link} from '@inertiajs/vue3';
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <ul class="p-6">
-                        <li class="pb-2" v-for="company in companies" :key="company.id">
+                    <ul class="p-6 flex flex-wrap gap-6">
+                        <li class="pb-7 w-60" v-for="company in companies" :key="company.id">
                             <Link class="text-blue-500" :href="route('company', company.id)">{{
                                     company.name
                                 }}

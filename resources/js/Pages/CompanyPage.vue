@@ -1,6 +1,10 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head, Link} from '@inertiajs/vue3';
+import TextInput from "@/Components/TextInput.vue";
+import Modal from "@/Components/Modal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 </script>
 
 <template>
@@ -16,33 +20,48 @@ import {Head, Link} from '@inertiajs/vue3';
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <ul>
-                            <li>
-                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 2})">ИНН</Link>
-                                : {{ company.inn }}
-                            </li>
-                            <li>
-                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 3})">Общая
-                                    информация
+                            <li v-for="field in fields">
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: field.id})">
+                                    {{ fieldsNames[field.id] }}
                                 </Link>
-                                : {{ company.general_info }}
-                            </li>
-                            <li>
-                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 4})">Главный
-                                    директор
-                                </Link>
-                                : {{ company.ceo }}
-                            </li>
-                            <li>
-                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 5})">Адрес</Link>
-                                : {{ company.address }}
-                            </li>
-                            <li>
-                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 6})">Телефон</Link>
-                                : {{ company.phone }}
+                                : {{ company[field.name] }}
+                                <button class="ml-2" @click="showAddCommentModal(field.id)">+</button>
+                                <div>
+                                    <ul>
+                                        <li class="text-gray-400" v-for="comment in field.comments">
+                                            {{ formatDate(comment.created_at) }}
+                                            <strong>{{
+                                                    comment.user.name
+                                                }}</strong>: {{ comment.comment }}
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
                         </ul>
                     </div>
                 </div>
+                <Modal :show="isShowAddCommentModal" @close="closeModal">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900">
+                            Добавить комментарий к полю "{{ fieldsNames[selectedField] }}"
+                        </h2>
+                        <div class="mt-2">
+                            <InputLabel for="password" value="Password" class="sr-only"/>
+
+                            <TextInput
+                                v-model="newCommentForField"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="Комментарий"
+                            />
+                            <div class="mt-2">
+                                <SecondaryButton @click="closeModal">Cancel</SecondaryButton>
+                                <SecondaryButton @click="addCommentForField">Add</SecondaryButton>
+                            </div>
+                        </div>
+
+                    </div>
+                </Modal>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-2">
                     <div class="p-6 text-gray-900">
                         <div class="font-semibold text-xl text-gray-800 leading-tight">Комментарии компании</div>
@@ -75,6 +94,8 @@ import {Head, Link} from '@inertiajs/vue3';
     </AuthenticatedLayout>
 </template>
 <script>
+import axios from "axios";
+
 export default {
     props: {
         id: {
@@ -92,8 +113,21 @@ export default {
                 address: "",
                 phone: ""
             },
+            fieldsNames: {
+                //Обновить при изменении таблицы company_fields
+                '1': 'Название',
+                '2': 'ИНН',
+                '3': 'Общая информация',
+                '4': 'Генеральный директор',
+                '5': 'Адрес',
+                '6': 'Телефон'
+            },
+            newCommentForField: "",
+            isShowAddCommentModal: false,
+            selectedField: 1,
             comments: [],
             newComment: "",
+            fields: []
         }
     },
     methods: {
@@ -105,6 +139,10 @@ export default {
             const {data} = await axios.get(`companies/${this.id}/comments`);
             this.comments = data
         },
+        async getCompanyFieldsWithComments() {
+            const {data} = await axios.get(`http://127.0.0.1:8000/companies/${this.id}/fields`)
+            this.fields = data
+        },
         async addComment() {
             const newComment = this.newComment.trim()
             if (newComment) {
@@ -115,11 +153,34 @@ export default {
                 this.newComment = '';
                 this.comments = data;
             }
+        },
+        closeModal() {
+            this.isShowAddCommentModal = false
+        },
+        showAddCommentModal(fieldId) {
+            this.selectedField = fieldId
+            this.isShowAddCommentModal = true
+        },
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+        },
+        async addCommentForField() {
+            const newComment = this.newCommentForField.trim()
+            if (newComment) {
+                const {data} = await axios.post(`companies/${this.id}/field_comment/${this.selectedField}`, {
+                    comment: newComment
+                });
+                this.newCommentForField = '';
+                this.fields = this.fields.map(el => el.id === this.selectedField ? {...el, comments: data} : el);
+            }
+            this.isShowAddCommentModal = false
         }
     },
     mounted() {
         this.getCompany();
         this.getComments();
+        this.getCompanyFieldsWithComments();
     }
 }
 </script>

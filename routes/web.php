@@ -41,5 +41,6 @@ Route::post('companies/{companyId}/comments', [CompanyCommentController::class, 
 Route::get('companies/{companyId}/field_comment/{fieldId}', [FieldCommentController::class, 'show'])->name('field_comments.store');
 Route::post('companies/{companyId}/field_comment/{fieldId}', [FieldCommentController::class, 'store'])->name('field_comments.store');
 
+Route::get('companies/{companyId}/fields', [FieldCommentController::class, 'getFieldsWithComments']);
 
 require __DIR__ . '/auth.php';

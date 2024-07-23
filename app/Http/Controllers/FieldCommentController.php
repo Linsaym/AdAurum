@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
 use App\Http\Requests\FieldCommentRequest;
+use App\Models\CompanyField;
 use App\Models\FieldComment;
 use Illuminate\Support\Facades\Auth;
 
 class FieldCommentController extends Controller
 {
+    public function getFieldsWithComments(int $companyId)
+    {
+        return CompanyField::with(['comments' => function ($query) use ($companyId) {
+            $query->where('company_id', $companyId)->with('user');
+        }])->get();
+    }
+
     public function store(FieldCommentRequest $request, int $companyId, int $fieldId)
     {
         $userId = Auth::id();
