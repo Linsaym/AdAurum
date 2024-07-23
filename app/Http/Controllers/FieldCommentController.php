@@ -5,23 +5,28 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CompanyRequest;
 use App\Http\Requests\FieldCommentRequest;
 use App\Models\FieldComment;
+use Illuminate\Support\Facades\Auth;
 
 class FieldCommentController extends Controller
 {
-    public function store(FieldCommentRequest $request)
+    public function store(FieldCommentRequest $request, int $companyId, int $fieldId)
     {
-        $comment = FieldComment::create($request->validated());
+        $userId = Auth::id();
 
-        return response()->json([
-            'message' => 'Comment added successfully.',
-            'comment' => $comment,
-        ], 201);
+        $comment = FieldComment::create([
+            'comment' => $request->comment,
+            'company_id' => $companyId,
+            'field_id' => $fieldId,
+            'user_id' => $userId
+        ]);
+
+        return $this->show($companyId, $fieldId);
     }
 
-    public function index($companyId, $fieldId)
+    public function show(int $companyId, int $fieldId)
     {
         $comments = FieldComment::where('company_id', $companyId)
-            ->where('field_id', $fieldId)
+            ->where('field_id', $fieldId)->with('user')
             ->get();
 
         return response()->json($comments);

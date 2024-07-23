@@ -8,8 +8,6 @@ class CompanyRequest extends FormRequest
 {
     public function authorize()
     {
-        # TODO Возможно имеет смысл сделать так, чтобы компании могли создавать только админы
-        # В данный момент из за структуры интерфейса, нельзя создавать новые компании
         return true;
     }
 

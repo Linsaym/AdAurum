@@ -16,12 +16,9 @@ class CompanyController extends Controller
 
     public function store(CompanyRequest $request)
     {
-        $company = Company::create($request->validated());
+        Company::create($request->validated());
 
-        return response()->json([
-            'message' => 'Company created successfully.',
-            'company' => $company,
-        ], 201);
+        return $this->index();
     }
 
     public function show($id)

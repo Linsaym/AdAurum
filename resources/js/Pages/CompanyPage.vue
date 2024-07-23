@@ -1,10 +1,10 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 </script>
 
 <template>
-    <Head title="AdAurum"/>
+    <Head :title="company.name"/>
 
     <AuthenticatedLayout>
         <template #header>
@@ -16,11 +16,30 @@ import {Head} from '@inertiajs/vue3';
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <ul>
-                            <li>ИНН: {{ company.inn }}</li>
-                            <li>Общая информация: {{ company.general_info }}</li>
-                            <li>Главный директор: {{ company.ceo }}</li>
-                            <li>Адрес: {{ company.address }}</li>
-                            <li>Телефон: {{ company.phone }}</li>
+                            <li>
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 2})">ИНН</Link>
+                                : {{ company.inn }}
+                            </li>
+                            <li>
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 3})">Общая
+                                    информация
+                                </Link>
+                                : {{ company.general_info }}
+                            </li>
+                            <li>
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 4})">Главный
+                                    директор
+                                </Link>
+                                : {{ company.ceo }}
+                            </li>
+                            <li>
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 5})">Адрес</Link>
+                                : {{ company.address }}
+                            </li>
+                            <li>
+                                <Link class="text-blue-500" :href="route('field', {id: id, fieldId: 6})">Телефон</Link>
+                                : {{ company.phone }}
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -39,9 +58,8 @@ import {Head} from '@inertiajs/vue3';
                         </div>
                         <form @submit.prevent="addComment">
                             <div class="mt-4">
-                                <label for="new-comment" class="block text-sm font-medium text-gray-700">Добавить
-                                    комментарий</label>
-                                <input v-model="newComment" id="new-comment" type="text" class="mt-1 block w-full"/>
+                                <label class="block text-sm font-medium text-gray-700">Добавить комментарий</label>
+                                <input maxlength="999" v-model="newComment" type="text" class="mt-1 block w-full"/>
                             </div>
                             <div class="mt-4">
                                 <button type="submit"
@@ -58,11 +76,16 @@ import {Head} from '@inertiajs/vue3';
 </template>
 <script>
 export default {
+    props: {
+        id: {
+            default: 1,
+            type: Number
+        }
+    },
     data() {
         return {
-            companyId: 1,
             company: {
-                name: "",
+                name: "Загрузка...",
                 inn: "",
                 general_info: "",
                 ceo: "",
@@ -75,17 +98,17 @@ export default {
     },
     methods: {
         async getCompany() {
-            const {data} = await axios.get(`companies/${this.companyId}`);
+            const {data} = await axios.get(`companies/${this.id}`);
             this.company = data
         },
         async getComments() {
-            const {data} = await axios.get(`companies/${this.companyId}/comments`);
+            const {data} = await axios.get(`companies/${this.id}/comments`);
             this.comments = data
         },
         async addComment() {
             const newComment = this.newComment.trim()
             if (newComment) {
-                const {data} = await axios.post(`companies/${this.companyId}/comments`, {
+                const {data} = await axios.post(`companies/${this.id}/comments`, {
                     company_id: 1,
                     comment: newComment
                 });

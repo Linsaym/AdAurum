@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://vuejs.org/logo.svg" height="32"/> AdAurum Companies <img src="https://vuejs.org/logo.svg" height="32"/></h1>
+<h1 align="center"><img alt="vue" src="https://vuejs.org/logo.svg" height="32"/> AdAurum Companies <img alt="vue" src="https://vuejs.org/logo.svg" height="32"/></h1>
 <h2 align="center">Vue + Laravel</h2>
 <h3 align="center">В приложении вы можете оставлять комментарии к компаниям и их полям</h3>
 
@@ -39,3 +39,12 @@ php artisan migrate --seed
 php artisan serve
 ```
 
+И в отдельной консоли:
+
+```sh
+npm install
+```
+
+```sh
+npm run dev
+```
